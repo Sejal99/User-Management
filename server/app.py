@@ -68,7 +68,8 @@ def register():
         return jsonify({'message': 'Email already exists'}), 400
     
     new_user = User(username=username, email=email)
-    new_user.set_password(password)
+    #In Flask, using new_user.set_password(password) implies that the User model has a method called set_password that hashes the password and stores the hashed value. This method likely uses a library such as werkzeug.security to hash passwords.
+    new_user.set_password(password) 
     
     db.session.add(new_user)
     db.session.commit()
