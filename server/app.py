@@ -26,6 +26,19 @@ def create_users():
 
 #fetch single data
 @app.route('/users/<int:user_id>')
+def get_user(user_id):
+    user=User.query.get_or_404(user_id)
+    return jsonify(user.to_dict())
+
+#update route
+@app.route('/users/<int:user_id>',methods=['PUT'])
+def update_user(user_id):
+    data=request.get_json()
+    user=User.query.get_or_404(user_id)
+    user.username=data['username']
+    user.email=data['email']
+    db.session.commit()
+    return jsonify(user.to_dict())
 
 if __name__ == '__main__':
     with app.app_context():
