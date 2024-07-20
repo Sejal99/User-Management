@@ -40,6 +40,15 @@ def update_user(user_id):
     db.session.commit()
     return jsonify(user.to_dict())
 
+#delete route
+
+@app.route('/users/<int:user_id>',methods=['DELETE'])
+def delete_user(user_id):
+    user=User.query.get_or_404(user_id) #get user
+    db.session.delete(user) #delete user
+    db.session.commit()  #save the user
+    return ''
+
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()  #these two lines create tables in the database
