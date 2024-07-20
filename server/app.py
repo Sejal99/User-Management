@@ -1,4 +1,4 @@
-from flask import Flask,jsonify,request
+from flask import Flask,jsonify,request,session
 
 from config import Config
 from models import User,db
@@ -53,7 +53,7 @@ def delete_user(user_id):
 
 @app.route('/register', methods=['POST'])
 def register():
-    data = request.get_json()  #same as const data=req.body
+    data = request.get_json()  #same as const username=req.body
     username = data.get('username')
     email = data.get('email')
     password = data.get('password')
@@ -75,6 +75,22 @@ def register():
     db.session.commit()
     
     return jsonify({'message': 'User registered successfully'}), 201
+
+def login():
+    data = request.get_json()
+    username = data.get('username')
+    password = data.get('password')
+    
+    if not username or not password:
+        return jsonify({'message': 'Missing fields'}), 400
+    
+    user = User.query.filter_by(username=username).first()
+    if user is None or not user.check_password(password):
+        return jsonify({'message': 'Invalid credentials'}), 401
+    
+    session['user_id'] = user.id
+    return jsonify({'message': 'Login successful'}), 200
+
 
 
 if __name__ == '__main__':
