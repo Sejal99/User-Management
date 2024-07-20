@@ -5,6 +5,7 @@ from models import User,db
 
 app = Flask(__name__)
 app.config.from_object(Config)
+app.secret_key = 'supersecretkey' 
 db.init_app(app)
 
 #get users
@@ -48,6 +49,32 @@ def delete_user(user_id):
     db.session.delete(user) #delete user
     db.session.commit()  #save the user
     return ''
+
+
+@app.route('/register', methods=['POST'])
+def register():
+    data = request.get_json()  #same as const data=req.body
+    username = data.get('username')
+    email = data.get('email')
+    password = data.get('password')
+    
+    if not username or not email or not password:
+        return jsonify({'message': 'Missing fields'}), 400
+
+    if User.query.filter_by(username=username).first():
+        return jsonify({'message': 'Username already exists'}), 400
+    
+    if User.query.filter_by(email=email).first():
+        return jsonify({'message': 'Email already exists'}), 400
+    
+    new_user = User(username=username, email=email)
+    new_user.set_password(password)
+    
+    db.session.add(new_user)
+    db.session.commit()
+    
+    return jsonify({'message': 'User registered successfully'}), 201
+
 
 if __name__ == '__main__':
     with app.app_context():
